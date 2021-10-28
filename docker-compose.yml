@@ -1,12 +1,13 @@
 # =======================================================================
 # Platform Name            hslu-platform
 # Platform Stack:          trivadis/platys-modern-data-platform
-# Platform Stack Version:  1.13.0-preview
+# Platform Stack Version:  1.13.0
 # =======================================================================
 version: '3.5'
 networks:
   default:
     name: hslu-platform
+# enforce some dependencies
 # enforce some dependencies
 # enforce some dependencies
 # Enable PostgreSQL or MySQL for MLflow server
@@ -288,7 +289,7 @@ services:
       KSQL_BOOTSTRAP_SERVERS: kafka-1:19092,kafka-2:19093,kafka-3:19094
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_RESPONSE_HTTP_HEADERS_CONFIG: ''
-      KSQL_KSQL_CONNECT_URL: http://kafka-connect-1:8083
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect-1:8083,http://kafka-connect-2:8084
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry-1:8081
       KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
       KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 1
@@ -363,7 +364,7 @@ services:
     ports:
       - 28103:8000
     environment:
-      CONNECT_URL: http://${PUBLIC_IP}:8083/,http://${PUBLIC_IP}:8084/
+      CONNECT_URL: http://${PUBLIC_IP}:8083,http://${PUBLIC_IP}:8084
       PROXY: 'true'
     volumes:
       - ./data-transfer:/data-transfer
@@ -412,9 +413,9 @@ services:
                 url: "http://schema-registry-1:8081"
                 type: "confluent"
               connect:
-                - name: "kafka-connect-1"
+                - name: "connect-custer-1"
                   url: "http://kafka-connect-1:8083"
-                - name: "kafka-connect-2"
+                - name: "connect-custer-2"
                   url: "http://kafka-connect-2:8084"
     depends_on:
       - kafka-1
@@ -438,7 +439,8 @@ services:
       KAFKA_CLUSTERS_0_KSQLDBSERVER: http://ksqldb-server-1:8088
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry-1:8081
       KAFKA_CLUSTERS_0_JMXPORT: '9992'
-      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: kafka-connect
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: connect-custer
+      #KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: 'http://${DOCKER_HOST_IP}:8083'
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://kafka-connect-1:8083
       KAFKA_CLUSTERS_0_READONLY: 'False'
     volumes:
@@ -582,7 +584,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./documentation:/home/python/markdown
+      - ./doc:/home/python/markdown
       - ./data-transfer:/data-transfer
     restart: unless-stopped
   markdown-renderer:
@@ -595,8 +597,8 @@ services:
       DOCKER_HOST_IP: ${DOCKER_HOST_IP}
       DATAPLATFORM_HOME: ${DATAPLATFORM_HOME}
     volumes:
-      - ./documentation/templates:/templates
-      - ./documentation/templates:/scripts
+      - ./doc/templates:/templates
+      - ./doc/templates:/scripts
       - .:/variables
-      - ./documentation:/output
+      - ./doc:/output
       - ./data-transfer:/data-transfer
