@@ -321,6 +321,7 @@ services:
       - ./data-transfer:/data-transfer
     entrypoint: /bin/sh
     tty: true
+    restart: unless-stopped    
   #  ================================== kcat (used to be kafkacat)  ========================================== #
   kcat:
     image: edenhill/kcat:1.7.0
