@@ -10,6 +10,7 @@ networks:
 # enforce some dependencies
 # enforce some dependencies
 # enforce some dependencies
+# enforce some dependencies
 # Enable PostgreSQL or MySQL for MLflow server
 services:
   #  ================================== Zookeeper ========================================== #
@@ -321,7 +322,6 @@ services:
       - ./data-transfer:/data-transfer
     entrypoint: /bin/sh
     tty: true
-    restart: unless-stopped    
   #  ================================== kcat (used to be kafkacat)  ========================================== #
   kcat:
     image: edenhill/kcat:1.7.0
@@ -483,6 +483,45 @@ services:
       - -verbose
     entrypoint:
       - /pre-docker-entrypoint.sh
+    restart: unless-stopped
+  #  ================================== Tiboard Dashboard ========================================== #
+  tipboard:
+    image: trivadis/tipboard:latest
+    hostname: tipboard
+    container_name: tipboard
+    ports:
+      - 28172:7272
+    environment:
+      TIPBOARD_redis_host: "'redis-1'"
+      TIPBOARD_redis_port: 6379
+      TIPBOARD_redis_password: abc123!
+      TIPBOARD_redis_db: 4
+      TIPBOARD_debug: "'False'"
+      TIPBOARD_api_key: "'e2c3275d0e1a4bc0da360dd225d74a43'"
+      TIPBOARD_host: "'localhost'"
+      TIPBOARD_port: 7272
+      TIPBOARD_project_name: "'sample'"
+      TIPBOARD_flipboard_interval: 0
+    volumes:
+      - ./data-transfer:/data-transfer
+      - ./scripts/tipboard:/dashboards
+      - ./plugins/tipboard:/root/.tipboard/custom_tiles
+    restart: unless-stopped
+  #  ================================== Redis ========================================== #
+  redis-1:
+    image: bitnami/redis:6.2
+    hostname: redis-1
+    container_name: redis-1
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISABLE_COMMANDS=None
+      - REDIS_PASSWORD=abc123!
+      - REDIS_AOF_ENABLED=no
+    volumes:
+      - ./data-transfer:/data-transfer
     restart: unless-stopped
   #  ================================== PostgreSQL ========================================== #
   postgresql:
