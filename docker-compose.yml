@@ -1,13 +1,14 @@
 # =======================================================================
 # Platform Name            hslu-platform
 # Platform Stack:          trivadis/platys-modern-data-platform
-# Platform Stack Version:  1.13.0
+# Platform Stack Version:  1.14.0-preview
 # =======================================================================
 version: '3.5'
 networks:
   default:
     name: hslu-platform
 # enforce some dependencies
+# backward compatiblity to platform < 1.14.0
 # enforce some dependencies
 # enforce some dependencies
 # enforce some dependencies
@@ -15,9 +16,11 @@ networks:
 services:
   #  ================================== Zookeeper ========================================== #
   zookeeper-1:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:7.0.1
     container_name: zookeeper-1
     hostname: zookeeper-1
+    labels:
+      com.platys.name: zookeeper
     ports:
       - 2181:2181
     environment:
@@ -31,24 +34,27 @@ services:
     restart: unless-stopped
 #  ================================== Kafka ========================================== #
   kafka-1:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:7.0.1
     container_name: kafka-1
     hostname: kafka-1
+    labels:
+      com.platys.name: kafka
     depends_on:
       - zookeeper-1
     ports:
       - 9092:9092
       - 19092:19092
       - 29092:29092
+      - 39092:39092
       - 9992:9992
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_BROKER_RACK: dc1
+      KAFKA_BROKER_RACK: rack1
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-1:19092,LISTENER_DOCKERHOST://kafka-1:29092,LISTENER_EXTERNAL://kafka-1:9092
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-1:19092,LISTENER_DOCKERHOST://localhost:29092,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-1:19092,LISTENER_LOCAL://kafka-1:39092,LISTENER_DOCKERHOST://kafka-1:29092,LISTENER_EXTERNAL://kafka-1:9092
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-1:19092,LISTENER_LOCAL://localhost:39092,LISTENER_DOCKERHOST://${DOCKER_HOST_IP:-127.0.0.1}:29092,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
@@ -64,24 +70,27 @@ services:
       - ./data-transfer:/data-transfer
     restart: unless-stopped
   kafka-2:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:7.0.1
     container_name: kafka-2
     hostname: kafka-2
+    labels:
+      com.platys.name: kafka
     depends_on:
       - zookeeper-1
     ports:
       - 9093:9093
       - 19093:19093
       - 29093:29093
+      - 39093:39093
       - 9993:9993
     environment:
       KAFKA_BROKER_ID: 2
-      KAFKA_BROKER_RACK: dc1
+      KAFKA_BROKER_RACK: rack1
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-2:19093,LISTENER_DOCKERHOST://kafka-2:29093,LISTENER_EXTERNAL://kafka-2:9093
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-2:19093,LISTENER_DOCKERHOST://localhost:29093,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-2:19093,LISTENER_LOCAL://kafka-2:39093,LISTENER_DOCKERHOST://kafka-2:29093,LISTENER_EXTERNAL://kafka-2:9093
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-2:19093,LISTENER_LOCAL://localhost:39093,LISTENER_DOCKERHOST://${DOCKER_HOST_IP:-127.0.0.1}:29093,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
@@ -97,24 +106,27 @@ services:
       - ./data-transfer:/data-transfer
     restart: unless-stopped
   kafka-3:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:7.0.1
     container_name: kafka-3
     hostname: kafka-3
+    labels:
+      com.platys.name: kafka
     depends_on:
       - zookeeper-1
     ports:
       - 9094:9094
       - 19094:19094
       - 29094:29094
+      - 39094:39094
       - 9994:9994
     environment:
       KAFKA_BROKER_ID: 3
-      KAFKA_BROKER_RACK: dc1
+      KAFKA_BROKER_RACK: rack1
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-3:19094,LISTENER_DOCKERHOST://kafka-3:29094,LISTENER_EXTERNAL://kafka-3:9094
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-3:19094,LISTENER_DOCKERHOST://localhost:29094,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_INTERNAL:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT,LISTENER_DOCKERHOST:PLAINTEXT,LISTENER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: LISTENER_INTERNAL://kafka-3:19094,LISTENER_LOCAL://kafka-3:39094,LISTENER_DOCKERHOST://kafka-3:29094,LISTENER_EXTERNAL://kafka-3:9094
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_INTERNAL://kafka-3:19094,LISTENER_LOCAL://localhost:39094,LISTENER_DOCKERHOST://${DOCKER_HOST_IP:-127.0.0.1}:29094,LISTENER_EXTERNAL://${PUBLIC_IP:-127.0.0.1}:9094
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
@@ -129,38 +141,12 @@ services:
     volumes:
       - ./data-transfer:/data-transfer
     restart: unless-stopped
-  #  ================================== Schema Registry ========================================== #
-  schema-registry-1:
-    image: confluentinc/cp-schema-registry:6.2.0
-    hostname: schema-registry-1
-    container_name: schema-registry-1
-    labels:
-      com.platys.restapi.title: Schema Registry REST API
-      com.platys.restapi.url: http://${PUBLIC_IP}:8081
-    ports:
-      - 8081:8081
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry-1
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:19092,kafka-2:19093,kafka-3:19094
-      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
-      SCHEMA_REGISTRY_GROUP_ID: schema-registry
-      SCHEMA_REGISTRY_LEADER_ELIGIBILITY: 'True'
-      SCHEMA_REGISTRY_MODE_MUTABILITY: 'True'
-      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: backward
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: GET,POST,PUT,OPTIONS
-      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: info
-      SCHEMA_REGISTRY_DEBUG: 'False'
-    volumes:
-      - ./data-transfer:/data-transfer
-    restart: unless-stopped
   #  ================================== Kafka Connect ========================================== #
   kafka-connect-1:
-    image: confluentinc/cp-kafka-connect:6.2.0
+    image: confluentinc/cp-kafka-connect:7.0.1
     container_name: kafka-connect-1
     labels:
+      com.platys.name: kafka-connect
       com.platys.restapi.title: Kafka Connect REST API
       com.platys.restapi.url: http://${PUBLIC_IP}:8083
     ports:
@@ -187,19 +173,23 @@ services:
       CONNECT_LOG4J_LOGGERS: org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR
       CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: '[%d] %p %X{connector.context}%m (%c:%L)%n'
       CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/addl-plugins
+      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: All
       # CONNECT_SECURITY_PROTOCOL: SSL
       # CONNECT_SASL_MECHANISM: PLAIN
       # CONNECT_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="$CLUSTER_API_KEY" password="$CLUSTER_API_SECRET";
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-4.0.0.jar
+      #CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-4.0.0.jar
       AWS_ACCESS_KEY_ID: V42FCGRVMK24JJ8DHUYG
       AWS_SECRET_ACCESS_KEY: bKhWxVF3kQoLY9kFmt91l+tDrEoZjqnWXzY9Eza
       # External secrets config
       # See https://docs.confluent.io/current/connect/security.html#externalizing-secrets
       CONNECT_CONFIG_PROVIDERS: file
       CONNECT_CONFIG_PROVIDERS_FILE_CLASS: org.apache.kafka.common.config.provider.FileConfigProvider
+      OTEL_RESOURCE_ATTRIBUTES: service.name=connect
+      KAFKA_OPTS: -javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.exporter.otlp.endpoint=http://otel-collector:4317
     volumes:
       - ./data-transfer:/data-transfer
-      - ./plugins/kafka-connect:/etc/kafka-connect/addl-plugins
+      - ./plugins/kafka-connect/connectors:/etc/kafka-connect/addl-plugins
+      - ./plugins/opentelemetry/agents:/tmp
     command:
       # In the command section, $ are replaced with $$ to avoid the error 'Invalid interpolation format for "command" option'
       - bash
@@ -217,9 +207,10 @@ services:
         sleep infinity
     restart: unless-stopped
   kafka-connect-2:
-    image: confluentinc/cp-kafka-connect:6.2.0
+    image: confluentinc/cp-kafka-connect:7.0.1
     container_name: kafka-connect-2
     labels:
+      com.platys.name: kafka-connect
       com.platys.restapi.title: Kafka Connect REST API
       com.platys.restapi.url: http://${PUBLIC_IP}:8084
     ports:
@@ -246,26 +237,31 @@ services:
       CONNECT_LOG4J_LOGGERS: org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR
       CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: '[%d] %p %X{connector.context}%m (%c:%L)%n'
       CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/addl-plugins
+      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: All
       # CONNECT_SECURITY_PROTOCOL: SSL
       # CONNECT_SASL_MECHANISM: PLAIN
       # CONNECT_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="$CLUSTER_API_KEY" password="$CLUSTER_API_SECRET";
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-4.0.0.jar
+      #CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-4.0.0.jar
       AWS_ACCESS_KEY_ID: V42FCGRVMK24JJ8DHUYG
       AWS_SECRET_ACCESS_KEY: bKhWxVF3kQoLY9kFmt91l+tDrEoZjqnWXzY9Eza
       # External secrets config
       # See https://docs.confluent.io/current/connect/security.html#externalizing-secrets
       CONNECT_CONFIG_PROVIDERS: file
       CONNECT_CONFIG_PROVIDERS_FILE_CLASS: org.apache.kafka.common.config.provider.FileConfigProvider
+      OTEL_RESOURCE_ATTRIBUTES: service.name=connect
+      KAFKA_OPTS: -javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.exporter.otlp.endpoint=http://otel-collector:4317
     volumes:
       - ./data-transfer:/data-transfer
-      - ./plugins/kafka-connect:/etc/kafka-connect/addl-plugins
+      - ./plugins/kafka-connect/connectors:/etc/kafka-connect/addl-plugins
+      - ./plugins/opentelemetry/agents:/tmp
     restart: unless-stopped
   #  ================================== ksqlDB ========================================== #
   ksqldb-server-1:
-    image: confluentinc/ksqldb-server:0.22.0
+    image: confluentinc/ksqldb-server:0.23.1
     hostname: ksqldb-server-1
     container_name: ksqldb-server-1
     labels:
+      com.platys.name: ksqldb
       com.platys.restapi.title: ksqlDB Server REST API
       com.platys.restapi.url: http://${PUBLIC_IP}:8088
     ports:
@@ -290,14 +286,14 @@ services:
       KSQL_BOOTSTRAP_SERVERS: kafka-1:19092,kafka-2:19093,kafka-3:19094
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_RESPONSE_HTTP_HEADERS_CONFIG: ''
+      OTEL_RESOURCE_ATTRIBUTES: service.name=ksqldb
+      KSQL_OPTS: -javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.exporter.otlp.endpoint=http://otel-collector:4317
       KSQL_KSQL_CONNECT_URL: http://kafka-connect-1:8083,http://kafka-connect-2:8084
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry-1:8081
       KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
       KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 1
       KSQL_KSQL_QUERY_PULL_METRICS_ENABLED: 'true'
       KSQL_KSQL_HIDDEN_TOPICS: ^_.*,default_ksql_processing_log
-#      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
-#      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       KSQL_KSQL_SUPPRESS_ENABLED: 'False'
       KSQL_KSQL_SUPPRESS_BUFFER_SIZE_BYTES: '-1'
       KSQL_KSQL_QUERY_PULL_TABLE_SCAN_ENABLED: 'False'
@@ -308,25 +304,62 @@ services:
       - ./data-transfer:/data-transfer
       - ./plugins/ksql:/etc/ksqldb/ext
       - ./conf/ksqldb/etc/log4j.properties:/etc/ksqldb/log4j.properties
-      - ./plugins/kafka-connect:/etc/kafka-connect/addl-plugins
+      - ./plugins/kafka-connect/connectors:/etc/kafka-connect/addl-plugins
+      - ./plugins/opentelemetry/agents:/tmp
     restart: unless-stopped
   # Access the cli by running:
   # > docker exec -it ksqldb-cli ksql http://ksqldb-server-1:8088
   ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.22.0
+    image: confluentinc/ksqldb-cli:0.23.1
     container_name: ksqldb-cli
     hostname: ksqldb-cli
+    labels:
+      com.platys.name: ksqldb-cli
     depends_on:
       - ksqldb-server-1
     volumes:
       - ./data-transfer:/data-transfer
     entrypoint: /bin/sh
     tty: true
+    restart: unless-stopped
+  #  ================================== Confluent Schema Registry ========================================== #
+  schema-registry-1:
+    image: confluentinc/cp-schema-registry:7.0.1
+    hostname: schema-registry-1
+    container_name: schema-registry-1
+    labels:
+      com.platys.name: schema-registry
+      com.platys.restapi.title: Schema Registry REST API
+      com.platys.restapi.url: http://${PUBLIC_IP}:8081
+    ports:
+      - 8081:8081
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry-1
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:19092,kafka-2:19093,kafka-3:19094
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_GROUP_ID: schema-registry
+      SCHEMA_REGISTRY_LEADER_ELIGIBILITY: 'True'
+      SCHEMA_REGISTRY_MODE_MUTABILITY: 'True'
+      SCHEMA_REGISTRY_SCHEMA_COMPATIBILITY_LEVEL: backward
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: GET,POST,PUT,OPTIONS
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: info
+      SCHEMA_REGISTRY_DEBUG: 'False'
+      OTEL_RESOURCE_ATTRIBUTES: service.name=schema-registry
+      SCHEMA_REGISTRY_OPTS: -javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.exporter.otlp.endpoint=http://otel-collector:4317
+    volumes:
+      - ./data-transfer:/data-transfer
+      - ./plugins/opentelemetry/agents:/tmp
+    restart: unless-stopped
   #  ================================== kcat (used to be kafkacat)  ========================================== #
   kcat:
     image: edenhill/kcat:1.7.0
     container_name: kcat
     hostname: kcat
+    labels:
+      com.platys.name: kcat
     volumes:
       - ./data-transfer:/data-transfer
     entrypoint:
@@ -335,31 +368,13 @@ services:
       - |
         while [ 1 -eq 1 ];do sleep 60;done
     restart: unless-stopped
-  #  ================================== Schema Registry UI ========================================== #
-  schema-registry-ui:
-    image: landoop/schema-registry-ui:latest
-    container_name: schema-registry-ui
-    hostname: schema-registry-ui
-    labels:
-      com.platys.webui.title: Confluent Schema Registry UI
-      com.platys.webui.url: http://${PUBLIC_IP}:28102
-    depends_on:
-      - kafka-1
-      - schema-registry-1
-    ports:
-      - 28102:8000
-    environment:
-      SCHEMAREGISTRY_URL: http://${PUBLIC_IP}:8081
-    volumes:
-      - ./data-transfer:/data-transfer
-      - ./conf/resolv.conf:/etc/resolv.conf:ro
-    restart: unless-stopped
   #  ================================== Kafka Connect UI ========================================== #
   kafka-connect-ui:
     image: landoop/kafka-connect-ui:latest
     container_name: kafka-connect-ui
     hostname: kafka-connect-ui
     labels:
+      com.platys.name: kafka-connect-ui
       com.platys.webui.title: Kafka Connect UI
       com.platys.webui.url: http://${PUBLIC_IP}:28103
     ports:
@@ -377,6 +392,7 @@ services:
     container_name: cmak
     hostname: cmak
     labels:
+      com.platys.name: cmak
       com.platys.webui.title: Cluster Manager for Apache Kafka UI
       com.platys.webui.url: http://${PUBLIC_IP}:28104
     depends_on:
@@ -399,6 +415,7 @@ services:
     container_name: akhq
     hostname: akhq
     labels:
+      com.platys.name: akhq
       com.platys.webui.title: Apache Kafka AQ UI
       com.platys.webui.url: http://${PUBLIC_IP}:28107
     ports:
@@ -411,7 +428,7 @@ services:
               properties:
                 bootstrap.servers: 'kafka-1:19092,kafka-2:19093,kafka-3:19094'
               schema-registry:
-                url: "http://schema-registry-1:8081"
+                url: "http://${PUBLIC_IP}:8081"
                 type: "confluent"
               connect:
                 - name: "connect-custer-1"
@@ -429,6 +446,7 @@ services:
     container_name: kafka-ui
     hostname: kafka-ui
     labels:
+      com.platys.name: kafka-ui
       com.platys.webui.title: Kafka UI
       com.platys.webui.url: http://${PUBLIC_IP}:28179
     ports:
@@ -438,7 +456,7 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:19092,kafka-2:19093,kafka-3:19094
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper-1:2181
       KAFKA_CLUSTERS_0_KSQLDBSERVER: http://ksqldb-server-1:8088
-      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry-1:8081
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://${PUBLIC_IP}:8081
       KAFKA_CLUSTERS_0_JMXPORT: '9992'
       KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: connect-custer
       #KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: 'http://${DOCKER_HOST_IP}:8083'
@@ -453,6 +471,7 @@ services:
     container_name: streamsets-1
     hostname: streamsets-1
     labels:
+      com.platys.name: streamsets
       com.platys.webui.title: StreamSets Data Collector UI
       com.platys.webui.url: http://${PUBLIC_IP}:18630
       com.platys.restapi.title: StreamSets Data Collector REST API
@@ -463,7 +482,7 @@ services:
       SDC_OFFSET_DIRECTORY: /data/custom-offset-el
       SDC_INSTALL_STAGES: streamsets-datacollector-apache-kafka_2_6-lib
       SDC_INSTALL_ENTERPRISE_STAGES: ''
-      SDC_JAVA_OPTS: -Xmx2g -Xms2g
+      SDC_JAVA_OPTS: -Xmx2g -Xms2g -Dlog4j2.formatMsgNoLookups=true
       SDC_JAVA8_OPTS: -XX:+UseG1GC
       SDC_CONF_MONITOR_MEMORY: 'true'
       SDC_CONF_PIPELINE_MAX_RUNNERS_COUNT: 50
@@ -484,7 +503,7 @@ services:
     entrypoint:
       - /pre-docker-entrypoint.sh
     restart: unless-stopped
-  #  ================================== Tiboard Dashboard ========================================== #
+  #  ================================== Tipboard Dashboard ========================================== #
   tipboard:
     image: trivadis/tipboard:latest
     hostname: tipboard
@@ -492,7 +511,7 @@ services:
     labels:
       com.platys.name: tipboard
       com.platys.webui.title: Tipboard UI
-      com.platys.webui.url: http://${PUBLIC_IP}:28172    
+      com.platys.webui.url: http://${PUBLIC_IP}:28172
     ports:
       - 28172:7272
     environment:
@@ -516,12 +535,13 @@ services:
     image: bitnami/redis:6.2
     hostname: redis-1
     container_name: redis-1
+    labels:
+      com.platys.name: redis
     ports:
       - 6379:6379
     environment:
       - REDIS_REPLICATION_MODE=master
       - ALLOW_EMPTY_PASSWORD=yes
-      - DISABLE_COMMANDS=None
       - REDIS_PASSWORD=abc123!
       - REDIS_AOF_ENABLED=no
     volumes:
@@ -532,6 +552,8 @@ services:
     image: postgres:13
     container_name: postgresql
     hostname: postgresql
+    labels:
+      com.platys.name: postgresql
     ports:
       - 5432:5432
     environment:
@@ -553,6 +575,7 @@ services:
     container_name: adminer
     hostname: adminer
     labels:
+      com.platys.name: adminer
       com.platys.webui.title: Adminer UI
       com.platys.webui.url: http://${PUBLIC_IP}:28131
     ports:
@@ -566,6 +589,7 @@ services:
     container_name: cloudbeaver
     hostname: cloudbeaver
     labels:
+      com.platys.name: cloudbeaver
       com.platys.webui.title: Cloudbeaver UI
       com.platys.webui.url: http://${PUBLIC_IP}:8978
     ports:
@@ -579,6 +603,8 @@ services:
     image: eclipse-mosquitto:2.0
     hostname: mosquitto-1
     container_name: mosquitto-1
+    labels:
+      com.platys.name: mosquitto
     ports:
       - 1883:1883
       - 9101:9001
@@ -592,6 +618,7 @@ services:
     container_name: mqtt-ui
     hostname: mqtt-ui
     labels:
+      com.platys.name: hivemq-ui
       com.platys.webui.title: HiveMQ UI
       com.platys.webui.url: http://${PUBLIC_IP}:28136
     ports:
@@ -599,12 +626,13 @@ services:
     volumes:
       - ./data-transfer:/data-transfer
     restart: unless-stopped
-  #  ================================== cAdvisor ========================================== #
+  #  ================================== Wetty ========================================== #
   wetty:
     image: svenihoney/wetty:latest
     container_name: wetty
     hostname: wetty
     labels:
+      com.platys.name: wetty
       com.platys.webui.title: WeTTY UI
       com.platys.webui.url: http://${PUBLIC_IP}:3001
     ports:
@@ -623,26 +651,33 @@ services:
     container_name: markdown-viewer
     hostname: markdown-viewer
     labels:
+      com.platys.name: markdown-viewer
       com.platys.webui.title: Markdown Viewer UI
       com.platys.webui.url: http://${PUBLIC_IP}:80
     ports:
       - 80:80
     volumes:
-      - ./doc:/home/python/markdown
+      - ./artefacts:/home/python/markdown
       - ./data-transfer:/data-transfer
     restart: unless-stopped
   markdown-renderer:
     image: trivadis/jinja2-renderer:latest
     container_name: markdown-renderer
     hostname: markdown-renderer
+    labels:
+      com.platys.name: markdown-renderer
     environment:
       USE_PUBLIC_IP: 'True'
       PUBLIC_IP: ${PUBLIC_IP}
       DOCKER_HOST_IP: ${DOCKER_HOST_IP}
       DATAPLATFORM_HOME: ${DATAPLATFORM_HOME}
+      PLATYS_PLATFORM_NAME: hslu-platform
+      PLATYS_PLATFORM_STACK: trivadis/platys-modern-data-platform
+      PLATYS_PLATFORM_STACK_VERSION: 1.14.0-preview
+      PLATYS_COPY_COOKBOOK_DATA: 'True'
     volumes:
-      - ./doc/templates:/templates
-      - ./doc/templates:/scripts
+      - ./artefacts/templates:/templates
+      - ./artefacts/templates:/scripts
       - .:/variables
-      - ./doc:/output
+      - ./artefacts:/output
       - ./data-transfer:/data-transfer
