@@ -10,7 +10,7 @@ The Modern Data Platform version 1.14.0 contains the following bug fixes and enh
 
  * Kouncil
  * Apicurio Registry
- * Streamsets DataCollector Cloud
+ * Streamsets DataOps Platform
  * Grafana Loki
  * Grafana Promtail
  * Avro Tools
@@ -35,8 +35,9 @@ The Modern Data Platform version 1.14.0 contains the following bug fixes and enh
 
 ### Version upgrades
 
- * Update `DataHub` to `0.8.20`
- * Update `Trino` to `366`
+ * Update `DataHub` to `0.8.25`
+ * Update `Trino` to `371`
+ * Update `Starburst Enterprise` to `369-e`
  * Update `Apache NiFi` to `1.15.0`
  * Update `Hasura` to `v2.0.0-beta.2`
  * Update `ksqlDB` to `0.23.1`
@@ -51,8 +52,42 @@ The Modern Data Platform version 1.14.0 contains the following bug fixes and enh
  * Update `Amundsen Frontend` to `4.0.0` and `Amundsen Search` to `3.0.0`
  * Update `InfluxDB 2` to `2.1.1`
  * Update `EventStore`to `21.10.1-buster-slim`
- * Update `Keycloak` to `16.1.0`
- 
+ * Update `Keycloak` to `16.1.1`
+ * Update `Dremio` to `20.0`
+ * Update `Minio` to `RELEASE.2022-02-01T18-00-14Z`
+ * Update `lakeFS` to `0.58.0`
+ * Update `Vault` to `1.9.3`
+ * Update `Ranger` to `2.2.0`
+ * Update `Materialize` to `v0.19.0`
+ * Update `kcat` to `1.7.1`
+ * Update `Debezium` to `1.8.0.Final`
+ * Update `Datastax` to `6.8.19`
+ * Update `Elasticsearch` to `7.17.0`
+ * Update `Node-RED` to `2.2.0`
+ * Update `Spring Dataflow` to `2.9.2` and `Skipper` to `2.8.2`
+ * Update `MLflow` to `1.23.1`
+ * Update `Optuna Dashboard` to `0.5.0`
+ * Update `Kie-Server` to `7.61.0.Final`
+ * Update `Grafana` to `8.3.4`
+ * Update `Kibana` to `7.17.0`
+ * Update `Memchached` to `1.6.13`
+ * Update `Solr` to `8.11` 
+ * Update `DGraph` to `v21.12.0`
+ * Update `Stardog` to `7.8.3-java11-preview`
+ * Update `GraphDB` to `9.10.1`
+ * Update `QuestDB` to `6.2`
+ * Update `Druid` to `0.22.1`
+ * Update `Pinot` to `0.9.3`
+ * Update `Prometheus` to `v2.33.1` and `pushgateway` to `v1.4.2` and `nodeexporter` to `v1.3.1`
+ * Update `Tile38` to `1.27.1`
+ * Update `Axon` to `4.5.10`
+ * Update `Hasura` to `v2.2.0`
+ * Update `Emq` to `4.3.11`
+ * Update `Cedalo Mgmt Center` to `2.2`
+ * Update `Thingsboard` to `3.3.3`
+ * Update `RabbitMQ` to `3.9-management`
+ * Update `Watchtower` to `1.4.0`
+
 ### Breaking Changes
 
  * InfluxDB is now listening on `19999` instead of `9999`
@@ -63,6 +98,7 @@ The Modern Data Platform version 1.14.0 contains the following bug fixes and enh
  * `KAFKA_BURROW_enable` renamed to `BURROW_enable`
  * `conf-override` renamed to `custom-conf` to better reflect the fact, that this folder is only for cusotmized configuration files which will not be overwritten when re-generating the platform
  * If manually copying Kafka Connect connectors, then no longer place them into `plugins/kafka-connect` but `plugins/kafka-connect/connectors`
+ * Rename of the `python` configuration settings (`PYTHON_artefacts_folder` and `PYTHON_script_file`)
 
 ### Enhancements 
 
@@ -70,6 +106,7 @@ The Modern Data Platform version 1.14.0 contains the following bug fixes and enh
  * All services in the Services List Markdown page (http://dataplatform/services) contain a link to their homepage
  * Configuration page also links to the serice homepage
  * Support Authentication and Authorization in Apicurio Registry via Keycloak
+ * Added support for PIP packages to be installed before running the `python` container
 
 ### Bug Fixes 
 

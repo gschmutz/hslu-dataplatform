@@ -508,7 +508,7 @@
       #
       # ===== Redis Commander ========
       #
-      REDIS_COMMANDER_enable: false
+      REDIS_COMMANDER_enable: true
       #
       # ===== Apache Casandra ========
       #
