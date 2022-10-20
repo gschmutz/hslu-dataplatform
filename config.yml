@@ -4,7 +4,7 @@
       platys:
           platform-name: 'hslu-platform'
           platform-stack: 'trivadis/platys-modern-data-platform'
-          platform-stack-version: '1.14.0-preview'
+          platform-stack-version: '1.16.0-preview'
           structure: 'flat'
       # ========================================================================
       # Global configuration, valid for all or a group of services
@@ -325,9 +325,9 @@
       STREAMSETS_google_support: false
       STREAMSETS_azure_support: false
       STREAMSETS_nosql_support: false
-      # some values for stage libs:  'streamsets-datacollector-apache-kafka_2_6-lib,streamsets-datacollector-aws-lib,streamsets-datacollector-azure-lib,streamsets-datacollector-groovy_2_4-lib,streamsets-datacollector-jdbc-lib'
+      # some values for stage libs:  'streamsets-datacollector-apache-kafka_2_7-lib,streamsets-datacollector-aws-lib,streamsets-datacollector-azure-lib,streamsets-datacollector-groovy_2_4-lib,streamsets-datacollector-jdbc-lib'
       # https://streamsets.com/documentation/datacollector/latest/help/datacollector/UserGuide/Installation/AddtionalStageLibs.html
-      STREAMSETS_stage_libs: 'streamsets-datacollector-apache-kafka_2_6-lib'
+      STREAMSETS_stage_libs: 'streamsets-datacollector-apache-kafka_2_7-lib'
       STREAMSETS_enterprise_stage_libs: ''
       STREAMSETS_install_pipelines: false
       # one of 'none', 'basic', 'digest', 'form' or 'aster'
