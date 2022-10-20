@@ -1,4 +1,4 @@
-# Platform Stack: `modern-data-platform` - v1.14.0
+# Platform Stack: `modern-data-platform` - v1.15.0
 
 This Platform Stack defines the set of services for a Modern Data Platform, such as
 
@@ -26,6 +26,7 @@ See [What's new?](./documentation/changes) for a detailed list of changes.
 
 * [Getting Started with `platys` and `modern-data-platform` stack](./documentation/getting-started)
 * [Configuration](./documentation/configuration) - all settings configurable in the `config.yml`
+* [Tutorials](./tutorials/README) - various tutorials detailed instructions on how to work with `platys`
 * [Cookbooks](./cookbooks/README) - various recipes showing how to use specific features of `platys`
 * [Port Mapping](./documentation/port-mapping)
 * [Frequently Asked Questions](./documentation/faq)
